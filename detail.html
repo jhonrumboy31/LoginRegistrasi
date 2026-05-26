@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Wisata</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1976D2; display: flex; justify-content: center; min-height: 100vh; }
+        .phone { background: #f0f2f5; width: 100%; max-width: 390px; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #1976D2; padding: 16px; display: flex; align-items: center; gap: 12px; }
+        .back-btn { color: white; font-size: 22px; background: none; border: none; cursor: pointer; }
+        .header h1 { color: white; font-size: 16px; font-weight: bold; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .share-btn { color: white; font-size: 20px; background: none; border: none; cursor: pointer; }
+
+        /* Hero */
+        .hero { width: 100%; height: 230px; position: relative; background: #e0e0e0; }
+        .hero img { width: 100%; height: 230px; object-fit: cover; display: block; }
+        .hero-fallback { width: 100%; height: 230px; background: linear-gradient(135deg, #1976D2, #42A5F5); display: none; align-items: center; justify-content: center; font-size: 90px; }
+        .rating-badge { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.65); color: #FFD700; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+
+        /* Content */
+        .content { background: white; flex: 1; border-radius: 24px 24px 0 0; margin-top: -16px; padding: 20px; }
+        .title { font-size: 20px; font-weight: bold; color: #222; margin-bottom: 4px; }
+        .location { color: #1976D2; font-size: 13px; margin-bottom: 16px; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .info-card { background: #F3F8FF; border-radius: 10px; padding: 12px; }
+        .info-label { font-size: 11px; color: #999; margin-bottom: 4px; }
+        .info-value { font-size: 13px; font-weight: bold; color: #333; }
+
+        .section-label { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .desc-text { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 20px; }
+
+        .fasilitas-box { background: #E8F5E9; border-radius: 10px; padding: 14px; margin-bottom: 20px; }
+        .fasilitas-box .section-label { color: #2E7D32; }
+        .fasilitas-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .fasilitas-tag { background: white; color: #388E3C; font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 1px solid #A5D6A7; }
+
+        .action-row { display: flex; gap: 10px; }
+        .btn-maps { flex: 1; padding: 13px; background: #1976D2; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-share { flex: 1; padding: 13px; background: #E3F2FD; color: #1976D2; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    </style>
+</head>
+<body>
+<div class="phone">
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='home.html'">←</button>
+        <h1 id="headerTitle">Detail Wisata</h1>
+        <button class="share-btn" onclick="shareWisata()">📤</button>
+    </div>
+
+    <div class="hero">
+        <img id="heroImg" src="" alt="Foto Wisata"
+            onerror="this.style.display='none'; document.getElementById('heroFallback').style.display='flex';">
+        <div class="hero-fallback" id="heroFallback">🏝️</div>
+        <div class="rating-badge" id="ratingBadge">⭐ -</div>
+    </div>
+
+    <div class="content">
+        <div class="title" id="wisataTitle">-</div>
+        <div class="location" id="wisataLocation">-</div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">🎟️ Harga Tiket</div>
+                <div class="info-value" id="wisataTiket">-</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">🕐 Jam Buka</div>
+                <div class="info-value" id="wisataJam">-</div>
+            </div>
+        </div>
+
+        <div class="section-label">📖 Deskripsi</div>
+        <div class="desc-text" id="wisataDesc">-</div>
+
+        <div class="fasilitas-box">
+            <div class="section-label">🏪 Fasilitas</div>
+            <div class="fasilitas-list" id="fasilitasList"></div>
+        </div>
+
+        <div class="action-row">
+            <a id="mapsBtn" href="#" class="btn-maps" target="_blank">🗺️ Buka Maps</a>
+            <button class="btn-share" onclick="shareWisata()">📤 Bagikan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+    // Cek login
+    auth.onAuthStateChanged(user => {
+        if (!user) window.location.href = 'login.html';
+    });
+
+    // Ambil data dari sessionStorage (Intent Parcelable)
+    const data = JSON.parse(sessionStorage.getItem('selectedWisata'));
+
+    if (!data) {
+        window.location.href = 'home.html';
+    } else {
+        document.getElementById('headerTitle').textContent = data.imageTitle || 'Detail Wisata';
+        document.getElementById('heroImg').src = data.imageUrl || '';
+        document.getElementById('ratingBadge').textContent = '⭐ ' + (data.rating || '4.5');
+        document.getElementById('wisataTitle').textContent = data.imageTitle || '-';
+        document.getElementById('wisataLocation').textContent = '📍 ' + (data.location || 'Jayapura, Papua');
+        document.getElementById('wisataTiket').textContent = data.tiket || '-';
+        document.getElementById('wisataJam').textContent = data.jamBuka || '-';
+        document.getElementById('wisataDesc').textContent = data.imageDesc || '-';
+        document.getElementById('mapsBtn').href = 'https://maps.google.com/?q=' + encodeURIComponent((data.imageTitle || '') + ' Jayapura Papua');
+
+        // Tampilkan fasilitas
+        const fasilitas = (data.fasilitas || '').split(',');
+        const container = document.getElementById('fasilitasList');
+        fasilitas.forEach(f => {
+            if (f.trim()) {
+                const tag = document.createElement('span');
+                tag.className = 'fasilitas-tag';
+                tag.textContent = f.trim();
+                container.appendChild(tag);
+            }
+        });
+    }
+
+    function shareWisata() {
+        if (navigator.share) {
+            navigator.share({ title: data.imageTitle, text: 'Cek wisata ' + data.imageTitle + ' di Jayapura!' });
+        } else {
+            alert('Wisata: ' + data.imageTitle);
+        }
+    }
+</script>
+</body>
+</html>

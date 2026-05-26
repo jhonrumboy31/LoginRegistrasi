@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1976D2; display: flex; justify-content: center; min-height: 100vh; }
+        .phone { background: #f0f2f5; width: 100%; max-width: 390px; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #1976D2; padding: 50px 24px 40px; text-align: center; }
+        .logo { width: 70px; height: 70px; background: white; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .header h1 { color: white; font-size: 22px; }
+        .header p { color: #BBDEFB; font-size: 13px; margin-top: 6px; }
+        .content { background: white; flex: 1; border-radius: 24px 24px 0 0; margin-top: -16px; padding: 28px 20px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; color: #555; margin-bottom: 6px; font-size: 13px; font-weight: bold; }
+        input { width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; background: #fafafa; }
+        input:focus { border-color: #1976D2; background: white; }
+        .forgot { text-align: right; margin-bottom: 20px; margin-top: -8px; }
+        .forgot a { color: #1976D2; font-size: 13px; text-decoration: none; }
+        .btn { width: 100%; padding: 14px; background: #1976D2; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-bottom: 16px; }
+        .btn:hover { background: #1565C0; }
+        .btn:disabled { background: #90CAF9; cursor: not-allowed; }
+        .link-text { text-align: center; font-size: 14px; color: #666; }
+        .link-text a { color: #1976D2; text-decoration: none; font-weight: bold; }
+        .msg { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .msg.error { background: #FFEBEE; color: #C62828; }
+        .loading { display: none; text-align: center; color: #1976D2; font-size: 13px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="header">
+            <div class="logo">🔐</div>
+            <h1>Selamat Datang!</h1>
+            <p>Silakan login untuk melanjutkan</p>
+        </div>
+        <div class="content">
+            <div class="msg" id="msgBox"></div>
+            <div class="loading" id="loading">⏳ Sedang login...</div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="Masukkan email kamu">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Masukkan password kamu">
+            </div>
+            <div class="forgot">
+                <a href="forgot_password.html">Lupa Password?</a>
+            </div>
+            <button class="btn" id="btnLogin" onclick="loginUser()">Masuk</button>
+            <div class="link-text">Belum punya akun? <a href="register.html">Daftar Sekarang</a></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // onStart() — kalau sudah login, langsung ke home
+        auth.onAuthStateChanged(user => {
+            if (user) window.location.href = 'home.html';
+        });
+
+        // function loginUser() — login dengan Firebase Auth
+        function loginUser() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const msgBox = document.getElementById('msgBox');
+            const loading = document.getElementById('loading');
+            const btn = document.getElementById('btnLogin');
+
+            if (!email || !password) {
+                showMsg('❌ Email dan password wajib diisi!');
+                return;
+            }
+
+            btn.disabled = true;
+            loading.style.display = 'block';
+            msgBox.style.display = 'none';
+
+            // Login ke Firebase Authentication
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    // Login berhasil → pindah ke home
+                    window.location.href = 'home.html';
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    btn.disabled = false;
+                    let pesan = '❌ Login gagal!';
+                    if (error.code === 'auth/user-not-found') pesan = '❌ Email tidak terdaftar!';
+                    if (error.code === 'auth/wrong-password') pesan = '❌ Password salah!';
+                    if (error.code === 'auth/invalid-email') pesan = '❌ Format email tidak valid!';
+                    if (error.code === 'auth/too-many-requests') pesan = '❌ Terlalu banyak percobaan, coba lagi nanti!';
+                    showMsg(pesan);
+                });
+        }
+
+        function showMsg(text) {
+            const msgBox = document.getElementById('msgBox');
+            msgBox.className = 'msg error';
+            msgBox.textContent = text;
+            msgBox.style.display = 'block';
+        }
+
+        // Enter key untuk login
+        document.addEventListener('keypress', e => {
+            if (e.key === 'Enter') loginUser();
+        });
+    </script>
+</body>
+</html>

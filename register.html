@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1976D2; display: flex; justify-content: center; min-height: 100vh; }
+        .phone { background: #f0f2f5; width: 100%; max-width: 390px; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #1976D2; padding: 50px 24px 40px; text-align: center; position: relative; }
+        .back { position: absolute; left: 16px; top: 16px; color: white; text-decoration: none; font-size: 22px; }
+        .logo { font-size: 40px; margin-bottom: 10px; }
+        .header h1 { color: white; font-size: 22px; }
+        .header p { color: #BBDEFB; font-size: 13px; margin-top: 6px; }
+        .content { background: white; flex: 1; border-radius: 24px 24px 0 0; margin-top: -16px; padding: 28px 20px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; color: #555; margin-bottom: 6px; font-size: 13px; font-weight: bold; }
+        input { width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; background: #fafafa; }
+        input:focus { border-color: #1976D2; background: white; }
+        .btn { width: 100%; padding: 14px; background: #1976D2; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; margin-bottom: 16px; }
+        .btn:hover { background: #1565C0; }
+        .btn:disabled { background: #90CAF9; cursor: not-allowed; }
+        .link-text { text-align: center; font-size: 14px; color: #666; }
+        .link-text a { color: #1976D2; text-decoration: none; font-weight: bold; }
+        .msg { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .msg.success { background: #E8F5E9; color: #2E7D32; }
+        .msg.error { background: #FFEBEE; color: #C62828; }
+        .loading { display: none; text-align: center; color: #1976D2; font-size: 13px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="login.html" class="back">←</a>
+            <div class="logo">📝</div>
+            <h1>Buat Akun Baru</h1>
+            <p>Daftar untuk memulai</p>
+        </div>
+        <div class="content">
+            <div class="msg" id="msgBox"></div>
+            <div class="loading" id="loading">⏳ Mendaftarkan akun...</div>
+
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="nama" placeholder="Masukkan nama lengkap">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="Masukkan email kamu">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Minimal 6 karakter">
+            </div>
+            <button class="btn" id="btnRegister" onclick="registerUser()">Daftar Sekarang</button>
+            <div class="link-text">Sudah punya akun? <a href="login.html">Login di sini</a></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // Kalau sudah login, langsung ke home
+        auth.onAuthStateChanged(user => {
+            if (user) window.location.href = 'home.html';
+        });
+
+        // function registerUser() — simpan akun ke Firebase Auth & Database
+        function registerUser() {
+            const nama = document.getElementById('nama').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const msgBox = document.getElementById('msgBox');
+            const loading = document.getElementById('loading');
+            const btn = document.getElementById('btnRegister');
+
+            // Validasi input
+            if (!nama || !email || !password) {
+                showMsg('error', '❌ Semua kolom wajib diisi!');
+                return;
+            }
+            if (password.length < 6) {
+                showMsg('error', '❌ Password minimal 6 karakter!');
+                return;
+            }
+
+            btn.disabled = true;
+            loading.style.display = 'block';
+            msgBox.style.display = 'none';
+
+            // Daftarkan akun ke Firebase Authentication
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+
+                    // Simpan data akun ke Firebase Realtime Database
+                    return database.ref('users/' + user.uid).set({
+                        nama: nama,
+                        email: email,
+                        createdAt: new Date().toISOString()
+                    });
+                })
+                .then(() => {
+                    loading.style.display = 'none';
+                    showMsg('success', '✅ Registrasi berhasil! Mengarahkan ke login...');
+                    setTimeout(() => {
+                        auth.signOut();
+                        window.location.href = 'login.html';
+                    }, 2000);
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    btn.disabled = false;
+                    let pesan = '❌ Gagal mendaftar!';
+                    if (error.code === 'auth/email-already-in-use') pesan = '❌ Email sudah terdaftar!';
+                    if (error.code === 'auth/invalid-email') pesan = '❌ Format email tidak valid!';
+                    if (error.code === 'auth/weak-password') pesan = '❌ Password terlalu lemah!';
+                    showMsg('error', pesan);
+                });
+        }
+
+        function showMsg(type, text) {
+            const msgBox = document.getElementById('msgBox');
+            msgBox.className = 'msg ' + type;
+            msgBox.textContent = text;
+            msgBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

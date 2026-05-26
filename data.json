@@ -1,0 +1,54 @@
+{
+  "wisata": {
+    "wisata1": {
+      "imageTitle": "Pantai Base-G",
+      "imageDesc": "Pantai indah bersejarah di Jayapura yang pernah menjadi homebase pasukan Sekutu pada Perang Dunia II tahun 1944",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Base_G_Beach_Jayapura.jpg/800px-Base_G_Beach_Jayapura.jpg",
+      "location": "Jayapura Utara, Papua",
+      "rating": "4.8",
+      "tiket": "Rp 10.000/orang",
+      "jamBuka": "07.00 - 18.00 WIT",
+      "fasilitas": "Parkir, Toilet, Warung Makan, Gazebo, Area Berenang"
+    },
+    "wisata2": {
+      "imageTitle": "Danau Sentani",
+      "imageDesc": "Danau terbesar di Papua yang terletak di kaki Pegunungan Cyclops, terkenal dengan Festival Danau Sentani setiap Juni",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Lake_Sentani_from_above.jpg/800px-Lake_Sentani_from_above.jpg",
+      "location": "Sentani, Kab. Jayapura",
+      "rating": "4.9",
+      "tiket": "Rp 15.000/orang",
+      "jamBuka": "06.00 - 18.00 WIT",
+      "fasilitas": "Perahu Wisata, Penginapan, Restoran, Toko Souvenir"
+    },
+    "wisata3": {
+      "imageTitle": "Pantai Hamadi",
+      "imageDesc": "Pantai bersejarah tempat pendaratan pasukan Sekutu pada Perang Dunia II, kini menjadi wisata sejarah dan alam yang menarik",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Hamadi_Beach_Jayapura.jpg/800px-Hamadi_Beach_Jayapura.jpg",
+      "location": "Hamadi, Jayapura Selatan",
+      "rating": "4.6",
+      "tiket": "Gratis",
+      "jamBuka": "24 Jam",
+      "fasilitas": "Parkir, Toilet, Warung Makan, Pasar Ikan, Area Memancing"
+    },
+    "wisata4": {
+      "imageTitle": "Cagar Alam Cyclops",
+      "imageDesc": "Kawasan konservasi alam seluas 245.000 hektar, kaya dengan flora dan fauna endemik Papua termasuk burung Cendrawasih",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Cyclops_Mountains_Papua.jpg/800px-Cyclops_Mountains_Papua.jpg",
+      "location": "Sentani, Kab. Jayapura",
+      "rating": "4.7",
+      "tiket": "Rp 20.000/orang",
+      "jamBuka": "07.00 - 17.00 WIT",
+      "fasilitas": "Jalur Trekking, Pemandu Wisata, Area Berkemah, Pos Jaga"
+    },
+    "wisata5": {
+      "imageTitle": "Museum Loka Budaya",
+      "imageDesc": "Museum Universitas Cenderawasih yang menyimpan ribuan koleksi artefak dan benda budaya dari seluruh Papua",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Museum_Loka_Budaya_UNCEN.jpg/800px-Museum_Loka_Budaya_UNCEN.jpg",
+      "location": "UNCEN, Jayapura",
+      "rating": "4.5",
+      "tiket": "Rp 5.000/orang",
+      "jamBuka": "08.00 - 16.00 WIT",
+      "fasilitas": "Ruang Pamer, Pemandu, Kafetaria, Toko Souvenir, Parkir"
+    }
+  }
+}
